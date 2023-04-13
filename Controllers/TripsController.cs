@@ -22,19 +22,19 @@ namespace TapInMotion.Controllers
         // GET: Trips
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Trip_1.Include(t => t.EndStation).Include(t => t.School).Include(t => t.StartStation).Include(t => t.Student).Include(t => t.Vehicle);
+            var applicationDbContext = _context.Trip.Include(t => t.EndStation).Include(t => t.School).Include(t => t.StartStation).Include(t => t.Student).Include(t => t.Vehicle);
             return View(await applicationDbContext.ToListAsync());
         }
 
         // GET: Trips/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Trip_1 == null)
+            if (id == null || _context.Trip == null)
             {
                 return NotFound();
             }
 
-            var trip = await _context.Trip_1
+            var trip = await _context.Trip
                 .Include(t => t.EndStation)
                 .Include(t => t.School)
                 .Include(t => t.StartStation)
@@ -84,12 +84,12 @@ namespace TapInMotion.Controllers
         // GET: Trips/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Trip_1 == null)
+            if (id == null || _context.Trip == null)
             {
                 return NotFound();
             }
 
-            var trip = await _context.Trip_1.FindAsync(id);
+            var trip = await _context.Trip.FindAsync(id);
             if (trip == null)
             {
                 return NotFound();
@@ -145,12 +145,12 @@ namespace TapInMotion.Controllers
         // GET: Trips/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Trip_1 == null)
+            if (id == null || _context.Trip == null)
             {
                 return NotFound();
             }
 
-            var trip = await _context.Trip_1
+            var trip = await _context.Trip
                 .Include(t => t.EndStation)
                 .Include(t => t.School)
                 .Include(t => t.StartStation)
@@ -170,14 +170,14 @@ namespace TapInMotion.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Trip_1 == null)
+            if (_context.Trip == null)
             {
                 return Problem("Entity set 'ApplicationDbContext.Trip_1'  is null.");
             }
-            var trip = await _context.Trip_1.FindAsync(id);
+            var trip = await _context.Trip.FindAsync(id);
             if (trip != null)
             {
-                _context.Trip_1.Remove(trip);
+                _context.Trip.Remove(trip);
             }
             
             await _context.SaveChangesAsync();
@@ -186,7 +186,7 @@ namespace TapInMotion.Controllers
 
         private bool TripExists(int id)
         {
-          return (_context.Trip_1?.Any(e => e.TripID == id)).GetValueOrDefault();
+          return (_context.Trip?.Any(e => e.TripID == id)).GetValueOrDefault();
         }
     }
 }

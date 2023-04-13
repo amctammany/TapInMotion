@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TapInMotion.Data;
 
@@ -10,9 +11,11 @@ using TapInMotion.Data;
 namespace TapInMotion.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230413040756_AddUserIDEverywhere")]
+    partial class AddUserIDEverywhere
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.4");
@@ -91,9 +94,11 @@ namespace TapInMotion.Data.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.Property<string>("LoginProvider")
+                        .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ProviderKey")
+                        .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ProviderDisplayName")
@@ -130,9 +135,11 @@ namespace TapInMotion.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LoginProvider")
+                        .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Value")
@@ -168,8 +175,7 @@ namespace TapInMotion.Data.Migrations
 
                     b.HasIndex("SchoolID");
 
-                    b.HasIndex("UserID")
-                        .IsUnique();
+                    b.HasIndex("UserID");
 
                     b.ToTable("Administrator");
                 });
@@ -345,8 +351,7 @@ namespace TapInMotion.Data.Migrations
 
                     b.HasIndex("SchoolID");
 
-                    b.HasIndex("UserID")
-                        .IsUnique();
+                    b.HasIndex("UserID");
 
                     b.ToTable("Student");
                 });
@@ -390,7 +395,7 @@ namespace TapInMotion.Data.Migrations
 
                     b.HasIndex("VehicleID");
 
-                    b.ToTable("Trip");
+                    b.ToTable("Trip_1");
                 });
 
             modelBuilder.Entity("TapInMotion.Models.Vehicle", b =>
@@ -488,8 +493,8 @@ namespace TapInMotion.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("TapInMotion.Models.AppUser", "User")
-                        .WithOne("Administrator")
-                        .HasForeignKey("TapInMotion.Models.Administrator", "UserID");
+                        .WithMany()
+                        .HasForeignKey("UserID");
 
                     b.Navigation("School");
 
@@ -516,8 +521,8 @@ namespace TapInMotion.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("TapInMotion.Models.AppUser", "User")
-                        .WithOne("Student")
-                        .HasForeignKey("TapInMotion.Models.Student", "UserID")
+                        .WithMany()
+                        .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -592,13 +597,6 @@ namespace TapInMotion.Data.Migrations
                     b.Navigation("PreviousStation");
 
                     b.Navigation("School");
-                });
-
-            modelBuilder.Entity("TapInMotion.Models.AppUser", b =>
-                {
-                    b.Navigation("Administrator");
-
-                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("TapInMotion.Models.School", b =>

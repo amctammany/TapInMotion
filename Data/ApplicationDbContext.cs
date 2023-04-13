@@ -1,10 +1,11 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using TapInMotion.Models;
 
 namespace TapInMotion.Data;
 
-public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options) { }
@@ -17,7 +18,6 @@ public class ApplicationDbContext : IdentityDbContext
 
     public DbSet<TapInMotion.Models.Station> Station { get; set; } = default!;
 
-    public DbSet<TapInMotion.Models.Station> Trip { get; set; } = default!;
     public DbSet<TapInMotion.Models.Administrator> Administrator { get; set; } = default!;
-    public DbSet<TapInMotion.Models.Trip> Trip_1 { get; set; } = default!;
+    public DbSet<TapInMotion.Models.Trip> Trip { get; set; } = default!;
 }
