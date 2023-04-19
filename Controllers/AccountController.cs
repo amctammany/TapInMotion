@@ -41,7 +41,7 @@ namespace TapInMotion.Controllers
             if (ModelState.IsValid)
             {
                 AppUser? user = await userManager.FindByEmailAsync(loginModel.Email.ToUpper());
-                System.Console.WriteLine(user.Email + user.Id);
+                // System.Console.WriteLine(user.Email + user.Id);
 
                 if (user != null)
                 {
@@ -78,9 +78,10 @@ namespace TapInMotion.Controllers
             return View(userManager.Users);
         }
 
+        [Authorize]
         public async Task<ViewResult> Manage()
         {
-            AppUser? user = await userManager.FindByNameAsync(User.Identity.Name);
+            AppUser? user = await userManager.FindByNameAsync(User.Identity?.Name ?? "");
             if (user != null)
             {
                 System.Console.WriteLine(user.Id);
@@ -113,7 +114,7 @@ namespace TapInMotion.Controllers
                     Email = model.Email,
                     AccountType = model.AccountType
                 };
-                IdentityResult result = await userManager.CreateAsync(user, model.Password);
+                IdentityResult result = await userManager.CreateAsync(user, model.Password!);
                 if (result.Succeeded)
                 {
                     if (model.AccountType == AccountType.Student)
@@ -187,15 +188,63 @@ namespace TapInMotion.Controllers
 
         public async Task<IActionResult> Edit(string id)
         {
-            AppUser? user = await userManager.FindByIdAsync(id);
+            AppUser? user = await userManager.FindByNameAsync(id);
+            ViewData["SchoolID"] = new SelectList(
+                _context.School,
+                "SchoolID",
+                "Name",
+                user?.Student?.SchoolID ?? user?.Administrator?.SchoolID
+            );
             if (user != null)
             {
-                return View(user);
+                Student? student = _context.Student.FirstOrDefault(s => s.UserID.Equals(user.Id));
+                Administrator? admin = _context.Administrator.FirstOrDefault(
+                    s => s.UserID.Equals(user.Id)
+                );
+                AccountEditorViewModel model =
+                    student != null
+                        ? new AccountEditorViewModel(student)
+                        : new AccountEditorViewModel(admin!);
+                // model.UserName = user.UserName!;
+                // model.Name = student?.Name ?? admin?.Name;
+                return View(model);
             }
             else
             {
                 return RedirectToAction("Index");
             }
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(
+            [Bind("UserName,AccountType,Name,SchoolID")] AccountEditorViewModel model
+        )
+        {
+            ViewData["SchoolID"] = new SelectList(
+                _context.School,
+                "SchoolID",
+                "Name",
+                model?.Student?.SchoolID ?? model?.Administrator?.SchoolID
+            );
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    if (model.Student != null)
+                        _context.Update(model.Student);
+                    if (model.Administrator != null)
+                        _context.Update(model.Administrator);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("Index");
+                }
+                catch (Exception e)
+                {
+                    System.Console.WriteLine(e.StackTrace.ToString());
+                }
+            }
+            return View(model);
         }
     }
 }
